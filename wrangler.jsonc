@@ -9,6 +9,6 @@
     "run_worker_first": true
   },
   "kv_namespaces": [
-    { "binding": "DB", "id": "GANTI_DENGAN_ID_KV_NAMESPACE" }
+    { "binding": "DB", "id": "41c9df439a2b4d24a332b3b784180fc5" }
   ]
 }
