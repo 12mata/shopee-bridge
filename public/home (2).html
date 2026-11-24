@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ee4d2d"><title>Etalase</title>
+<style>
+:root{--o:#ee4d2d;--o2:#f97316;--ink:#1c2630;--mut:#66727c;--line:#e6eaee;--bg:#f6f7f9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;padding-bottom:env(safe-area-inset-bottom,0)}
+img{display:block;max-width:100%}button{font:inherit;cursor:pointer}a{color:inherit}
+:focus-visible{outline:3px solid #ffb703;outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 14px}
+.banner{background:linear-gradient(90deg,var(--o),var(--o2));color:#fff;text-align:center;font-weight:700;font-size:14px;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 0 12px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.q{display:block;width:100%;margin-top:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font:inherit}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chips button{flex:0 0 auto;border:0;background:var(--bg);padding:8px 16px;border-radius:99px;font-weight:650;font-size:14px;color:var(--ink)}
+.chips button[aria-pressed=true]{background:var(--o);color:#fff}
+.top{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 12px;gap:10px}
+h2{font-size:17px;font-weight:800}.cnt{font-size:13px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card[hidden]{display:none}
+.pic{position:relative;aspect-ratio:1/1;background:#eef1f4}.pic img{width:100%;height:100%;object-fit:cover}
+.off{position:absolute;top:8px;right:8px;background:#ffd23f;color:#1c2630;font-weight:800;font-size:12px;border-radius:8px;padding:3px 7px}
+.b{padding:10px 11px 12px;display:flex;flex-direction:column;flex:1}
+.st{font-size:12px;color:var(--mut);display:flex;gap:6px;align-items:center}
+.tag{background:var(--o);color:#fff;font-weight:700;border-radius:4px;padding:1px 6px;font-size:11px}
+.nm{font-size:14px;font-weight:650;margin:5px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.7em}
+.was{font-size:12px;color:var(--mut);text-decoration:line-through}
+.pr{font-size:18px;font-weight:850;color:var(--o)}
+.mt{font-size:12.5px;color:var(--mut);margin:2px 0 10px}
+.buy{margin-top:auto;display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:10px;background:var(--o);color:#fff;font-weight:800;font-size:14px;text-decoration:none}
+.buy:active{filter:brightness(.92)}
+.empty{text-align:center;color:var(--mut);padding:40px 0}
+footer{padding:26px 0 40px;font-size:12.5px;color:var(--mut)}footer p+p{margin-top:6px}
+@media(min-width:760px){.grid{grid-template-columns:repeat(4,1fr);gap:14px}}
+</style></head><body>
+<div class="banner" id="banner" hidden></div>
+<header><div class="wrap">
+  <h1 id="brand">Etalase</h1>
+  <input class="q" id="q" type="search" placeholder="Cari produk..." aria-label="Cari produk">
+  <div class="chips" id="chips" role="group" aria-label="Kategori"></div>
+</div></header>
+<main class="wrap">
+  <div class="top"><h2>Pilihan produk</h2><span class="cnt" id="cnt"></span></div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>Produk tidak ditemukan.</p>
+</main>
+<footer><div class="wrap"><p id="disc"></p><p>Harga, stok, dan promo mengikuti halaman produk di Shopee dan dapat berubah sewaktu-waktu.</p></div></footer>
+<script>
+(function(){
+var D=/*__DATA__*/null||{site:{},items:[]};
+var S=D.site||{},items=D.items||[];
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+var rp=function(n){return "Rp\u00a0"+Number(n).toLocaleString("id-ID")};
+var prefix=S.subIdPrefix||"home",pixelOn=/^\d{10,20}$/.test(S.pixelId||"");
+if(pixelOn){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq("init",S.pixelId);fbq("track","PageView");
+}
+document.title=S.brand||"Etalase";
+$("#brand").textContent=S.brand||"Etalase";
+if(S.banner){$("#banner").hidden=false;$("#banner").textContent=S.banner}
+$("#disc").textContent=S.disclosure||"Halaman ini berisi tautan afiliasi Shopee. Jika kamu membeli lewat tautan ini, kami bisa menerima komisi tanpa biaya tambahan untukmu.";
+function link(it){try{var u=new URL(it.link);u.searchParams.set(it.param||"site_id",prefix+"_"+it.slug+"_"+it.id);return u.toString()}catch(e){return it.link}}
+function ph(n){return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23e3e8ec'/><text x='100' y='122' font-size='84' text-anchor='middle' fill='%2366727c' font-family='sans-serif' font-weight='700'>"+esc((n||"?").charAt(0).toUpperCase())+"</text></svg>"}
+var cats=[];items.forEach(function(i){if(cats.indexOf(i.cat)<0)cats.push(i.cat)});
+$("#chips").innerHTML=["Semua"].concat(cats).map(function(c,n){return '<button type="button" data-c="'+esc(n?c:"")+'" aria-pressed="'+(n===0)+'">'+esc(c)+(n?"":" ("+items.length+")")+'</button>'}).join("");
+if(cats.length<2)$("#chips").hidden=true;
+$("#grid").innerHTML=items.map(function(i,n){
+  var off=i.oldPrice&&i.price&&i.oldPrice>i.price?Math.round((1-i.price/i.oldPrice)*100):0;
+  return '<article class="card" data-c="'+esc(i.cat)+'" data-n="'+esc(i.name.toLowerCase())+'">'+
+   '<div class="pic"><img src="'+esc(i.img||ph(i.name))+'" alt="'+esc(i.name)+'" '+(n<4?'':'loading="lazy" ')+'width="300" height="300" decoding="async" onerror="this.onerror=null;this.src=\''+ph(i.name).replace(/'/g,"%27")+'\'">'+(off?'<span class="off">-'+off+'%</span>':'')+'</div>'+
+   '<div class="b"><div class="st">'+(i.store?'<span class="tag">'+esc(i.store)+'</span>':'')+'<span>'+esc(i.cat)+'</span></div>'+
+   '<h3 class="nm">'+esc(i.name)+'</h3>'+(off?'<div class="was">'+rp(i.oldPrice)+'</div>':'')+
+   '<div class="pr">'+(i.price?rp(i.price):'')+'</div>'+
+   '<div class="mt">'+(i.rating?'\u2605 '+esc(i.rating):'')+(i.rating&&i.sold?' \u00b7 ':'')+esc(i.sold||"")+'</div>'+
+   '<a class="buy" href="'+esc(link(i))+'" data-id="'+esc(i.id)+'" data-name="'+esc(i.name)+'" rel="nofollow sponsored noopener">Beli di Shopee</a></div></article>';
+}).join("");
+var cat="";
+function apply(){
+  var q=$("#q").value.trim().toLowerCase(),n=0;
+  document.querySelectorAll("#grid .card").forEach(function(c){var show=(!cat||c.dataset.c===cat)&&(!q||c.dataset.n.indexOf(q)>-1);c.hidden=!show;if(show)n++});
+  $("#cnt").textContent="Menampilkan "+n+" produk";$("#empty").hidden=n>0;
+}
+$("#chips").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});apply()});
+$("#q").addEventListener("input",apply);apply();
+var locked=false;
+window.addEventListener("pageshow",function(){locked=false});
+document.addEventListener("click",function(e){
+  var a=e.target.closest("a.buy");if(!a)return;e.preventDefault();
+  if(locked)return;locked=true;var d=0;
+  try{if(pixelOn&&typeof fbq==="function"){fbq("track","InitiateCheckout",{content_name:a.dataset.name,content_ids:[a.dataset.id],content_type:"product",currency:"IDR"},{eventID:"ic_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)});d=250}}catch(x){}
+  setTimeout(function(){location.href=a.href},d);setTimeout(function(){locked=false},3000);
+});
+})();
+</script></body></html>
