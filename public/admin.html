@@ -32,7 +32,8 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
   <div><label>Meta Pixel ID</label><input id="pixelId"></div>
   <div><label>Prefix Sub_ID (mis. meta_hujan_vid1)</label><input id="subIdPrefix"></div>
   <div><label>Nama parameter Sub_ID</label><input id="subIdParam" value="site_id"></div>
-  <div><label>Nama brand (atas halaman)</label><input id="brand"></div></div>
+  <div><label>Nama brand (atas halaman)</label><input id="brand"></div>
+  <div><label>Nama di menu navigasi</label><input id="navLabel" placeholder="mis. Jas Hujan"></div></div>
   <label>Judul SEO (tab browser &amp; hasil Google, sekitar 60 karakter)</label><input id="seoTitle" maxlength="90">
   <label>Meta description (sekitar 150 karakter)</label><textarea id="seoDesc" maxlength="200"></textarea>
   <label>Headline (samakan dengan hook video)</label><input id="headline">
@@ -40,7 +41,7 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
   <label>Keunggulan (1 baris = 1 poin, maks 3)</label><textarea id="benefits"></textarea>
   <label>Teks tombol produk utama</label><input id="cta" value="Beli produk ini di Shopee">
   <label>Judul bagian produk lain</label><input id="moreTitle" value="Pilihan lain yang cocok">
-  <label><input type="checkbox" id="showHome" checked style="width:auto"> Tampilkan produk halaman ini di beranda</label>
+  <label><input type="checkbox" id="showHome" checked style="width:auto"> Tampilkan halaman ini di beranda &amp; menu navigasi</label>
   <label>Ulasan asli (1 baris: Nama | isi ulasan). Kosongkan jika belum ada.</label><textarea id="reviews"></textarea>
  </div>
  <h2>Produk (yang pertama = produk utama / hero)</h2>
@@ -63,7 +64,7 @@ function fill(c){
   const h=c.hero||{};
   ['pixelId','subIdPrefix','subIdParam','brand','moreTitle'].forEach(k=>{if(c[k]!=null)$(k).value=c[k]});
   $('headline').value=h.headline||'';$('sub').value=h.sub||'';$('cta').value=h.cta||$('cta').value;
-  $('showHome').checked=c.showHome!==false;$('seoTitle').value=c.seoTitle||'';$('seoDesc').value=c.seoDesc||'';
+  $('showHome').checked=c.showHome!==false;$('seoTitle').value=c.seoTitle||'';$('navLabel').value=c.navLabel||'';$('seoDesc').value=c.seoDesc||'';
   $('benefits').value=(h.benefits||[]).join('\n');
   $('reviews').value=(c.reviews||[]).map(r=>r.name+' | '+r.text).join('\n');
   $('prods').innerHTML='';
@@ -111,7 +112,7 @@ function collect(){
   const rows=[...$('prods').children].map((d,i)=>{const o={};d.querySelectorAll('[data-k]').forEach(el=>{let v=el.value.trim();if(el.type==='number')v=v?Number(v):null;o[el.dataset.k]=v});o.id=i?'p'+i:'hero1';o.imgs=d._imgs||[];o.img=o.imgs[0]||'';return o});
   const hero=rows[0]||{};
   Object.assign(hero,{headline:$('headline').value,sub:$('sub').value,cta:$('cta').value,benefits:$('benefits').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,3)});
-  return{pixelId:$('pixelId').value.trim(),subIdParam:$('subIdParam').value.trim()||'site_id',subIdPrefix:$('subIdPrefix').value.trim(),brand:$('brand').value,pageTitle:$('brand').value,seoTitle:$('seoTitle').value.trim(),seoDesc:$('seoDesc').value.trim(),
+  return{pixelId:$('pixelId').value.trim(),subIdParam:$('subIdParam').value.trim()||'site_id',subIdPrefix:$('subIdPrefix').value.trim(),brand:$('brand').value,pageTitle:$('brand').value,seoTitle:$('seoTitle').value.trim(),navLabel:$('navLabel').value.trim(),seoDesc:$('seoDesc').value.trim(),
     moreTitle:$('moreTitle').value,moreLead:'',showHome:$('showHome').checked,hero,products:rows.slice(1),
     reviews:$('reviews').value.split('\n').filter(l=>l.includes('|')).map(l=>{const[n,...t]=l.split('|');return{name:n.trim(),text:t.join('|').trim(),source:'Ulasan pembeli di Shopee'}})};
 }
