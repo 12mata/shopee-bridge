@@ -80,6 +80,15 @@ footer{padding:26px 0 96px;color:var(--mut);font-size:12.5px}
 .bar .cta{flex:0 0 auto;min-height:46px;font-size:15px;padding:8px 18px;box-shadow:0 3px 0 var(--od)}
 @media(min-width:760px){.hero-grid{grid-template-columns:1.1fr .9fr;align-items:center;gap:40px}.grid{grid-template-columns:repeat(4,1fr)}.reviews{grid-template-columns:repeat(3,1fr)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar,.cta{transition:none}#heroCta{animation:none}}
+
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.logo{display:inline-flex;align-items:center;gap:3px;text-decoration:none;font-size:25px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.logo b{display:inline-block;padding:3px 8px 4px;border-radius:8px;transform:rotate(-4deg);box-shadow:0 3px 0 rgba(0,0,0,.16)}
+.nav{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;width:100%}.nav::-webkit-scrollbar{display:none}
+.nav a{flex:0 0 auto;text-decoration:none;font-weight:700;font-size:14px;min-height:36px;padding:0 14px;border-radius:99px;display:inline-flex;align-items:center}
+@media(min-width:760px){.nav{width:auto}}
+.logo{color:#fff}.logo b{background:var(--sun);color:var(--ink)}
+.nav a{background:rgba(255,255,255,.18);color:#fff}.nav a[aria-current=page]{background:#fff;color:var(--o)}
 </style>
 </head>
 <body>
@@ -88,6 +97,10 @@ footer{padding:26px 0 96px;color:var(--mut);font-size:12.5px}
 
 <header class="hero">
   <div class="wrap">
+    <div class="hd">
+      <a class="logo" href="/" aria-label="ShopeeSale, ke beranda"><span>Shopee</span><b>Sale</b></a>
+      <nav class="nav" aria-label="Menu halaman"><!--NAV--></nav>
+    </div>
     <p class="brand" id="brand"></p>
     <div class="hero-grid">
       <div>
