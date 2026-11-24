@@ -14,6 +14,34 @@ function seo(html, o) {
     .replace('</head>', () => '<meta name="description" content="' + esc(o.desc) + '">' + tags + '</head>');
 }
 
+
+// ---- menu navigasi: daftar halaman dari admin (disimpan di KV key "nav") ----
+async function navItems(env) {
+  const l = await env.DB.list({ prefix: 'page:' });
+  const out = [];
+  for (const k of l.keys) {
+    const p = JSON.parse((await env.DB.get(k.name)) || '{}');
+    if (p.showHome === false || !p.hero) continue;
+    const s = k.name.slice(5);
+    out.push({ slug: s, label: p.navLabel || p.brand || s });
+  }
+  return out;
+}
+async function rebuildNav(env, cur, curData) {
+  let items = (await navItems(env)).filter(i => i.slug !== cur);
+  if (curData && curData.showHome !== false && curData.hero) items.push({ slug: cur, label: curData.navLabel || curData.brand || cur });
+  items.sort((a, b) => (a.slug < b.slug ? -1 : 1));
+  await env.DB.put('nav', JSON.stringify(items));
+  return items;
+}
+async function getNav(env) {
+  const v = await env.DB.get('nav');
+  return v ? JSON.parse(v) : rebuildNav(env);
+}
+function navHtml(items, cur) {
+  return [{ slug: '', label: 'Beranda' }].concat(items).map(i => '<a href="/' + esc(i.slug) + '"' + (i.slug === cur ? ' aria-current="page"' : '') + '>' + esc(i.label) + '</a>').join('');
+}
+
 function authed(req, env) {
   const h = req.headers.get('authorization') || '';
   if (!h.startsWith('Basic ') || !env.ADMIN_PASSWORD) return false;
@@ -50,8 +78,8 @@ export default {
       if (m) {
         const k = 'page:' + m[1];
         if (req.method === 'GET') { const v = await env.DB.get(k); return v ? new Response(v, { headers: { 'content-type': 'application/json' } }) : J({}, 404); }
-        if (req.method === 'PUT') { await env.DB.put(k, JSON.stringify(await req.json())); return J({ ok: 1 }); }
-        if (req.method === 'DELETE') { await env.DB.delete(k); return J({ ok: 1 }); }
+        if (req.method === 'PUT') { const body = await req.json(); await env.DB.put(k, JSON.stringify(body)); await rebuildNav(env, m[1], body); return J({ ok: 1 }); }
+        if (req.method === 'DELETE') { await env.DB.delete(k); await rebuildNav(env, m[1], null); return J({ ok: 1 }); }
       }
       if (path === '/api/admin/img' && req.method === 'POST') {
         const b = await req.arrayBuffer();
@@ -92,14 +120,16 @@ export default {
       }
       const h = await (await env.ASSETS.fetch(u.origin + '/home.html')).text();
       const hs = seo(h, { title: site.seoTitle || site.brand || 'Etalase', desc: site.seoDesc || '', img: (items[0] && items[0].img) ? u.origin + items[0].img : '', url: u.origin + '/' });
-      return new Response(hs.replace('/*__DATA__*/null', () => JSON.stringify({ site, items: items.slice(0, 80) }).replace(/</g, '\\u003c')), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' } });
+      const nav = navHtml(await getNav(env), '');
+      return new Response(hs.replace('<!--NAV-->', () => nav).replace('/*__DATA__*/null', () => JSON.stringify({ site, items: items.slice(0, 80) }).replace(/</g, '\\u003c')), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' } });
     }
     const v = await env.DB.get('page:' + slug);
     if (!v) return new Response('Halaman tidak ditemukan', { status: 404 });
     const t = await (await env.ASSETS.fetch(u.origin + '/index.html')).text();
     const c = JSON.parse(v), hero = c.hero || {};
     const ts = seo(t, { title: c.seoTitle || c.pageTitle || hero.name || '', desc: c.seoDesc || hero.sub || '', img: hero.img ? u.origin + hero.img : '', url: u.origin + '/' + slug });
-    return new Response(ts.replace('/*__DATA__*/null', () => v.replace(/</g, '\\u003c')), {
+    const nav = navHtml(await getNav(env), slug);
+    return new Response(ts.replace('<!--NAV-->', () => nav).replace('/*__DATA__*/null', () => v.replace(/</g, '\\u003c')), {
       headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' }
     });
   }
