@@ -43,6 +43,7 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
   <label>Ulasan asli (1 baris: Nama | isi ulasan). Kosongkan jika belum ada.</label><textarea id="reviews"></textarea>
  </div>
  <h2>Produk (yang pertama = produk utama / hero)</h2>
+ <div class="row" style="margin-bottom:10px"><label style="margin:0">Impor hasil ekstensi (.json): <input type="file" id="imp" accept=".json" style="width:auto"></label></div>
  <div id="prods"></div>
  <div class="row"><button onclick="addProd()">+ Tambah produk</button><button class="y" onclick="save()">Simpan</button><button class="x" onclick="del()">Hapus halaman</button></div>
 </div>
@@ -115,5 +116,18 @@ function collect(){
 }
 async function save(){try{await api('/api/admin/page/'+slug,{method:'PUT',body:JSON.stringify(collect())});toast('Tersimpan');refresh()}catch(e){toast('Gagal simpan')}}
 async function del(){if(!confirm('Hapus halaman '+slug+'?'))return;await api('/api/admin/page/'+slug,{method:'DELETE'});$('ed').hidden=true;refresh()}
+$('imp').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const arr=JSON.parse(await f.text());
+    [...$('prods').children].forEach(d=>{const v=k=>d.querySelector('[data-k='+k+']').value;if(!v('name')&&!v('link')&&!(d._imgs||[]).length)d.remove()});
+    arr.forEach(it=>{
+      addProd({name:it.name,price:it.price,oldPrice:it.oldPrice,rating:it.rating,sold:it.sold,store:it.store,cat:it.cat,desc:it.desc});
+      $('prods').lastChild.querySelector('.urls').value=(it.images||[]).join('\n');
+    });
+    toast(arr.length+' produk diimpor. Isi link afiliasi tiap produk.');
+  }catch(x){toast('File tidak valid')}
+  e.target.value='';
+};
 loadSite();refresh().then(()=>load($('pages').value));
 </script></main></body></html>
