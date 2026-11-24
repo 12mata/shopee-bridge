@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin</title>
+<style>
+body{font:15px system-ui,sans-serif;margin:0;background:#eef4f7;color:#13232c}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:20px}h2{font-size:16px;margin:22px 0 8px}
+.box{background:#fff;border:1px solid #d8e3e9;border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:#566b77;margin:8px 0 3px}
+input,textarea,select{width:100%;padding:9px;border:1px solid #c5d3db;border-radius:8px;font:inherit;box-sizing:border-box}
+textarea{min-height:60px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+button{padding:10px 16px;border:0;border-radius:8px;background:#0d2b3a;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020;border:1px solid #e3b5bd}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.th{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#dbe9f0}
+.tag{font-weight:700;color:#17435a}
+#msg{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#0d2b3a;color:#fff;padding:10px 16px;border-radius:10px;display:none}
+</style></head><body><main>
+<h1>Admin halaman Shopee</h1>
+<div class="box row">
+  <select id="pages" style="flex:1"></select>
+  <button onclick="load(pages.value)">Buka</button>
+  <input id="newslug" placeholder="slug baru, mis. hujan" style="flex:1">
+  <button class="y" onclick="newPage()">Buat baru</button>
+</div>
+<div id="ed" hidden>
+ <h2>Halaman: <span id="cur" class="tag"></span> <a id="open" target="_blank" href="#">lihat</a></h2>
+ <div class="box"><div class="g">
+  <div><label>Meta Pixel ID</label><input id="pixelId"></div>
+  <div><label>Prefix Sub_ID (mis. meta_hujan_vid1)</label><input id="subIdPrefix"></div>
+  <div><label>Nama parameter Sub_ID</label><input id="subIdParam" value="site_id"></div>
+  <div><label>Nama brand (atas halaman)</label><input id="brand"></div></div>
+  <label>Headline (samakan dengan hook video)</label><input id="headline">
+  <label>Sub-headline</label><input id="sub">
+  <label>Keunggulan (1 baris = 1 poin, maks 3)</label><textarea id="benefits"></textarea>
+  <label>Teks tombol produk utama</label><input id="cta" value="Beli produk ini di Shopee">
+  <label>Judul bagian produk lain</label><input id="moreTitle" value="Pilihan lain yang cocok">
+  <label>Disclosure afiliasi</label><textarea id="disclosure">Halaman ini berisi tautan afiliasi Shopee. Jika kamu membeli lewat tautan ini, kami bisa menerima komisi tanpa biaya tambahan untukmu.</textarea>
+  <label>Ulasan asli (1 baris: Nama | isi ulasan). Kosongkan jika belum ada.</label><textarea id="reviews"></textarea>
+ </div>
+ <h2>Produk (yang pertama = produk utama / hero)</h2>
+ <div id="prods"></div>
+ <div class="row"><button onclick="addProd()">+ Tambah produk</button><button class="y" onclick="save()">Simpan</button><button class="x" onclick="del()">Hapus halaman</button></div>
+</div>
+<div id="msg"></div>
+<script>
+const $=id=>document.getElementById(id);
+const F=[['link','Link afiliasi lengkap'],['name','Nama produk'],['price','Harga (angka)','number'],['oldPrice','Harga coret (opsional)','number'],['rating','Rating (mis. 4.9)'],['sold','Terjual (mis. 10rb+ terjual)'],['store','Toko (Shopee Mall / Star+)'],['cat','Kategori (produk pendukung)'],['desc','Deskripsi singkat']];
+let slug='';
+function toast(t){const m=$('msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',2500)}
+async function api(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(r.status);return r.json()}
+async function refresh(){const l=await api('/api/admin/pages');$('pages').innerHTML=l.map(s=>`<option>${s}</option>`).join('')}
+function newPage(){const s=$('newslug').value.trim().toLowerCase().replace(/[^\w-]/g,'');if(!s)return;slug=s;fill({});}
+async function load(s){if(!s)return;slug=s;fill(await api('/api/admin/page/'+s))}
+function fill(c){
+  $('ed').hidden=false;$('cur').textContent=slug;$('open').href='/'+slug;
+  const h=c.hero||{};
+  ['pixelId','subIdPrefix','subIdParam','brand','moreTitle','disclosure'].forEach(k=>{if(c[k]!=null)$(k).value=c[k]});
+  $('headline').value=h.headline||'';$('sub').value=h.sub||'';$('cta').value=h.cta||$('cta').value;
+  $('benefits').value=(h.benefits||[]).join('\n');
+  $('reviews').value=(c.reviews||[]).map(r=>r.name+' | '+r.text).join('\n');
+  $('prods').innerHTML='';
+  const all=c.hero?[h].concat(c.products||[]):[];
+  all.forEach(addProd);if(!all.length)addProd();
+}
+function addProd(p){
+  p=p&&p.name!==undefined?p:{};
+  const d=document.createElement('div');d.className='box';
+  const first=!$('prods').children.length;
+  d.innerHTML=`<div class="row"><span class="tag">${first?'Produk utama':'Produk pendukung'}</span><img class="th" src="${p.img||''}"><input type="file" accept="image/*" style="width:auto"><input type="hidden" data-k="img" value="${p.img||''}"><button class="x" style="margin-left:auto" onclick="this.closest('.box').remove()">Hapus</button></div><div class="g">`+
+  F.map(([k,l,t])=>`<div><label>${l}</label><input data-k="${k}" type="${t||'text'}" value="${(p[k]??'').toString().replace(/"/g,'&quot;')}"></div>`).join('')+'</div>';
+  d.querySelector('input[type=file]').onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    const bm=await createImageBitmap(f),s=Math.min(1,800/Math.max(bm.width,bm.height));
+    const c=document.createElement('canvas');c.width=bm.width*s;c.height=bm.height*s;c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+    const b=await new Promise(r=>c.toBlob(r,'image/webp',.8));
+    try{const r=await api('/api/admin/img',{method:'POST',headers:{'content-type':b.type},body:b});
+      d.querySelector('[data-k=img]').value=r.url;d.querySelector('.th').src=r.url;toast('Gambar terunggah ('+Math.round(b.size/1024)+' KB)')}catch(x){toast('Gagal unggah gambar')}
+  };
+  $('prods').appendChild(d);
+}
+function collect(){
+  const rows=[...$('prods').children].map((d,i)=>{const o={};d.querySelectorAll('[data-k]').forEach(el=>{let v=el.value.trim();if(el.type==='number')v=v?Number(v):null;o[el.dataset.k]=v});o.id=i?'p'+i:'hero1';return o});
+  const hero=rows[0]||{};
+  Object.assign(hero,{headline:$('headline').value,sub:$('sub').value,cta:$('cta').value,benefits:$('benefits').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,3)});
+  return{pixelId:$('pixelId').value.trim(),subIdParam:$('subIdParam').value.trim()||'site_id',subIdPrefix:$('subIdPrefix').value.trim(),brand:$('brand').value,pageTitle:$('brand').value,
+    disclosure:$('disclosure').value,moreTitle:$('moreTitle').value,moreLead:'',hero,products:rows.slice(1),
+    reviews:$('reviews').value.split('\n').filter(l=>l.includes('|')).map(l=>{const[n,...t]=l.split('|');return{name:n.trim(),text:t.join('|').trim(),source:'Ulasan pembeli di Shopee'}})};
+}
+async function save(){try{await api('/api/admin/page/'+slug,{method:'PUT',body:JSON.stringify(collect())});toast('Tersimpan');refresh()}catch(e){toast('Gagal simpan')}}
+async function del(){if(!confirm('Hapus halaman '+slug+'?'))return;await api('/api/admin/page/'+slug,{method:'DELETE'});$('ed').hidden=true;refresh()}
+refresh().then(()=>load($('pages').value));
+</script></main></body></html>
