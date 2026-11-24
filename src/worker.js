@@ -14,6 +14,20 @@ export default {
     if (path === '/admin' || path.startsWith('/api/admin')) {
       if (!authed(req, env)) return new Response('Login diperlukan', { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="admin"' } });
       if (path === '/admin') return env.ASSETS.fetch(u.origin + '/admin.html');
+      if (path === '/api/admin/fetch-img') {
+        let t; try { t = new URL(u.searchParams.get('url') || ''); } catch { return J({ err: 'URL salah' }, 400); }
+        if (t.protocol !== 'https:' || !/(^|\.)(susercontent\.com|shopee\.co\.id|shopee\.com)$/.test(t.hostname)) return J({ err: 'Hanya gambar dari Shopee' }, 400);
+        const r = await fetch(t.href, { headers: { 'user-agent': 'Mozilla/5.0', referer: 'https://shopee.co.id/' } });
+        const ct = r.headers.get('content-type') || '';
+        if (!r.ok || !ct.startsWith('image/')) return J({ err: 'Gagal ambil gambar (' + r.status + ')' }, 502);
+        const b = await r.arrayBuffer();
+        if (b.byteLength > 8e6) return J({ err: 'Terlalu besar' }, 413);
+        return new Response(b, { headers: { 'content-type': ct } });
+      }
+      if (path === '/api/admin/site') {
+        if (req.method === 'PUT') { await env.DB.put('site', JSON.stringify(await req.json())); return J({ ok: 1 }); }
+        return new Response((await env.DB.get('site')) || '{}', { headers: { 'content-type': 'application/json' } });
+      }
       if (path === '/api/admin/pages') {
         const l = await env.DB.list({ prefix: 'page:' });
         return J(l.keys.map(k => k.name.slice(5)));
@@ -44,12 +58,27 @@ export default {
 
     // ---- file statis (favicon dll) ----
     if (path.includes('.')) {
-      if (path === '/admin.html' || path === '/index.html') return new Response('Not found', { status: 404 });
+      if (['/admin.html','/index.html','/home.html'].includes(path)) return new Response('Not found', { status: 404 });
       return env.ASSETS.fetch(req);
     }
 
     // ---- halaman publik: /hujan, /bersih, dst ----
-    const slug = path.replace(/^\/|\/$/g, '') || 'default';
+    const slug = path.replace(/^\/|\/$/g, '');
+    if (!slug) {
+      const site = JSON.parse((await env.DB.get('site')) || '{}');
+      const l = await env.DB.list({ prefix: 'page:' });
+      const items = [];
+      for (const k of l.keys) {
+        const p = JSON.parse((await env.DB.get(k.name)) || '{}');
+        if (p.showHome === false || !p.hero) continue;
+        if (!site.pixelId && p.pixelId) site.pixelId = p.pixelId;
+        [p.hero].concat(p.products || []).forEach(x => {
+          if (x && x.name && x.link) items.push({ slug: k.name.slice(5), id: x.id, name: x.name, price: x.price, oldPrice: x.oldPrice, rating: x.rating, sold: x.sold, store: x.store, cat: x.cat || 'Lainnya', img: x.img, link: x.link, desc: x.desc, param: p.subIdParam || 'site_id' });
+        });
+      }
+      const h = await (await env.ASSETS.fetch(u.origin + '/home.html')).text();
+      return new Response(h.replace('/*__DATA__*/null', () => JSON.stringify({ site, items: items.slice(0, 80) }).replace(/</g, '\\u003c')), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' } });
+    }
     const v = await env.DB.get('page:' + slug);
     if (!v) return new Response('Halaman tidak ditemukan', { status: 404 });
     const t = await (await env.ASSETS.fetch(u.origin + '/index.html')).text();
