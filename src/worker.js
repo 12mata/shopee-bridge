@@ -1,5 +1,19 @@
 const J = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json' } });
 
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// isi <title>, meta description, Open Graph, dan canonical langsung dari server (terbaca Google & Facebook tanpa JavaScript)
+function seo(html, o) {
+  const tags = '<link rel="canonical" href="' + esc(o.url) + '">' +
+    '<meta property="og:type" content="website"><meta property="og:url" content="' + esc(o.url) + '">' +
+    '<meta property="og:title" content="' + esc(o.title) + '"><meta property="og:description" content="' + esc(o.desc) + '">' +
+    (o.img ? '<meta property="og:image" content="' + esc(o.img) + '">' : '');
+  return html
+    .replace(/<title>[\s\S]*?<\/title>/, () => '<title>' + esc(o.title) + '</title>')
+    .replace(/<meta name="description"[^>]*>/, () => '')
+    .replace('</head>', () => '<meta name="description" content="' + esc(o.desc) + '">' + tags + '</head>');
+}
+
 function authed(req, env) {
   const h = req.headers.get('authorization') || '';
   if (!h.startsWith('Basic ') || !env.ADMIN_PASSWORD) return false;
@@ -77,12 +91,15 @@ export default {
         });
       }
       const h = await (await env.ASSETS.fetch(u.origin + '/home.html')).text();
-      return new Response(h.replace('/*__DATA__*/null', () => JSON.stringify({ site, items: items.slice(0, 80) }).replace(/</g, '\\u003c')), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' } });
+      const hs = seo(h, { title: site.seoTitle || site.brand || 'Etalase', desc: site.seoDesc || '', img: (items[0] && items[0].img) ? u.origin + items[0].img : '', url: u.origin + '/' });
+      return new Response(hs.replace('/*__DATA__*/null', () => JSON.stringify({ site, items: items.slice(0, 80) }).replace(/</g, '\\u003c')), { headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' } });
     }
     const v = await env.DB.get('page:' + slug);
     if (!v) return new Response('Halaman tidak ditemukan', { status: 404 });
     const t = await (await env.ASSETS.fetch(u.origin + '/index.html')).text();
-    return new Response(t.replace('/*__DATA__*/null', () => v.replace(/</g, '\\u003c')), {
+    const c = JSON.parse(v), hero = c.hero || {};
+    const ts = seo(t, { title: c.seoTitle || c.pageTitle || hero.name || '', desc: c.seoDesc || hero.sub || '', img: hero.img ? u.origin + hero.img : '', url: u.origin + '/' + slug });
+    return new Response(ts.replace('/*__DATA__*/null', () => v.replace(/</g, '\\u003c')), {
       headers: { 'content-type': 'text/html;charset=utf-8', 'cache-control': 'public,max-age=60' }
     });
   }
