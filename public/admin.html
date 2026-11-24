@@ -1,364 +1,119 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d2b3a">
-<title>Perlengkapan Hujan Pilihan</title>
-<meta name="description" content="Pilihan perlengkapan hujan terbaik dari toko resmi Shopee.">
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin</title>
 <style>
-:root{
-  --ink:#0d2b3a; --ink2:#17435a; --rain:#8cc3dc; --mist:#eef4f7; --paper:#fff;
-  --sun:#ffc21a; --sun-d:#e6a800; --text:#13232c; --muted:#566b77; --line:#d8e3e9;
-  --r-lg:20px; --r-md:14px; --r-sm:10px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  color:var(--text);background:var(--mist);line-height:1.5;
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-img{display:block;max-width:100%}
-a{color:inherit}
-button{font:inherit;cursor:pointer}
-:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
-.wrap{width:100%;max-width:960px;margin:0 auto;padding:0 16px}
-
-/* draft banner */
-.draft{background:var(--sun);color:var(--ink);font-size:13px;font-weight:700;text-align:center;padding:8px 12px}
-
-/* hero */
-.hero{
-  background:var(--ink);color:#fff;
-  background-image:repeating-linear-gradient(105deg,rgba(255,255,255,.055) 0 1px,transparent 1px 15px);
-  padding:calc(env(safe-area-inset-top,0px) + 18px) 0 28px;
-}
-.brand{font-size:14px;font-weight:700;color:var(--rain);letter-spacing:.01em;margin-bottom:14px}
-.hero-grid{display:grid;gap:18px}
-h1{font-size:clamp(28px,7.4vw,44px);line-height:1.08;font-weight:850;letter-spacing:-.025em;max-width:16ch}
-.sub{margin-top:10px;color:#cfe1ea;font-size:16px;max-width:38ch}
-.benefits{list-style:none;margin-top:14px;display:grid;gap:6px;font-size:15px;color:#e8f2f7}
-.benefits li{padding-left:24px;position:relative}
-.benefits li::before{content:"";position:absolute;left:0;top:.5em;width:12px;height:7px;border-left:2.5px solid var(--sun);border-bottom:2.5px solid var(--sun);transform:rotate(-45deg) translateY(-50%)}
-
-.hero-card{background:var(--paper);color:var(--text);border-radius:var(--r-lg);padding:12px;box-shadow:0 14px 34px rgba(0,0,0,.28)}
-.hero-card .pic{aspect-ratio:1/1;border-radius:var(--r-md);overflow:hidden;background:var(--mist)}
-.hero-card .pic img{width:100%;height:100%;object-fit:cover}
-.hero-card h2{font-size:18px;line-height:1.3;margin:12px 4px 2px;font-weight:750}
-.price-row{display:flex;align-items:baseline;gap:10px;margin:2px 4px 8px;flex-wrap:wrap}
-.price{font-size:28px;font-weight:850;letter-spacing:-.02em;color:var(--ink)}
-.was{color:var(--muted);text-decoration:line-through;font-size:14px}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 4px 12px}
-.chip{font-size:13px;font-weight:600;background:var(--mist);border-radius:99px;padding:4px 10px;color:var(--ink2)}
-
-.cta{
-  display:flex;align-items:center;justify-content:center;text-align:center;
-  min-height:54px;padding:12px 18px;border-radius:var(--r-md);
-  background:var(--sun);color:var(--ink);font-weight:800;font-size:17px;text-decoration:none;
-  box-shadow:0 3px 0 var(--sun-d);transition:transform .08s;
-}
-.cta:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sun-d)}
-.cta.sm{min-height:44px;font-size:15px;padding:8px 12px;box-shadow:0 2px 0 var(--sun-d)}
-.note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}
-
-/* sections */
-section{padding:30px 0 6px}
-h3{font-size:22px;font-weight:800;letter-spacing:-.015em;margin-bottom:4px}
-.lead{color:var(--muted);font-size:15px;margin-bottom:14px}
-.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
-.filters button{
-  flex:0 0 auto;border:1.5px solid var(--line);background:var(--paper);color:var(--ink2);
-  padding:7px 14px;border-radius:99px;font-weight:650;font-size:14px;min-height:38px;
-}
-.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.card{background:var(--paper);border-radius:var(--r-md);padding:8px;display:flex;flex-direction:column;border:1px solid var(--line)}
-.card .pic{aspect-ratio:1/1;border-radius:var(--r-sm);overflow:hidden;background:var(--mist)}
-.card .pic img{width:100%;height:100%;object-fit:cover}
-.card h4{font-size:14px;line-height:1.3;font-weight:650;margin:8px 2px 2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
-.card .p{font-size:17px;font-weight:800;color:var(--ink);margin:2px 2px 0}
-.card .m{font-size:12.5px;color:var(--muted);margin:0 2px 8px}
-.card .acts{margin-top:auto;display:grid;gap:6px}
-.ghost{
-  background:transparent;border:1.5px solid var(--line);color:var(--ink2);
-  border-radius:var(--r-sm);min-height:40px;font-weight:650;font-size:14px
-}
-.detail{font-size:13.5px;color:var(--text);background:var(--mist);border-radius:var(--r-sm);padding:9px 10px;margin:2px 0 4px}
-.detail[hidden]{display:none}
-.card[hidden]{display:none}
-
-.thumbs{display:flex;gap:6px;overflow-x:auto;margin:8px 4px 0}.thumbs button{border:2px solid var(--line);border-radius:8px;padding:0;background:none;width:56px;height:56px;flex:0 0 auto;overflow:hidden}.thumbs img{width:100%;height:100%;object-fit:cover}
-/* reviews */
-.reviews{display:grid;gap:10px}
-.rev{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
-.rev p{font-size:15px}
-.rev small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
-
-footer{padding:30px 0 96px;color:var(--muted);font-size:12.5px}
-footer p+p{margin-top:6px}
-
-/* sticky bar */
-.bar{
-  position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);
-  border-top:1px solid var(--line);
-  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
-  display:flex;gap:12px;align-items:center;justify-content:center;
-  transform:translateY(110%);transition:transform .25s ease;
-}
-.bar.on{transform:none}
-.bar .t{min-width:0;flex:1;max-width:360px}
-.bar .t b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar .t span{font-weight:850;color:var(--ink);font-size:16px}
-.bar .cta{flex:0 0 auto;min-height:46px;font-size:15px;padding:8px 18px}
-
-@media (min-width:760px){
-  .hero-grid{grid-template-columns:1.1fr .9fr;align-items:center;gap:36px}
-  .grid{grid-template-columns:repeat(4,1fr)}
-  .reviews{grid-template-columns:repeat(3,1fr)}
-}
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}.bar,.cta{transition:none}
-}
-</style>
-</head>
-<body>
-
-<div id="draft" class="draft" hidden>MODE DRAFT: ganti data placeholder (link Shopee, Pixel ID, harga, foto) di blok CONFIG sebelum dipakai iklan.</div>
-
-<header class="hero">
-  <div class="wrap">
-    <p class="brand" id="brand"></p>
-    <div class="hero-grid">
-      <div>
-        <h1 id="h1"></h1>
-        <p class="sub" id="sub"></p>
-        <ul class="benefits" id="benefits"></ul>
-      </div>
-      <article class="hero-card" id="heroCard"></article>
-    </div>
-  </div>
-</header>
-
-<main class="wrap">
-  <section id="moreSec">
-    <h3 id="moreTitle"></h3>
-    <p class="lead" id="moreLead"></p>
-    <div class="filters" id="filters" role="group" aria-label="Kategori produk"></div>
-    <div class="grid" id="grid"></div>
-  </section>
-
-  <section id="revSec" hidden>
-    <h3>Kata pembeli</h3>
-    <p class="lead">Ulasan asli dari halaman produk di Shopee.</p>
-    <div class="reviews" id="reviews"></div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <p id="disclosure"></p>
-    <p>Harga, stok, dan promo dapat berubah sewaktu-waktu mengikuti halaman produk di Shopee.</p>
-  </div>
-</footer>
-
-<div class="bar" id="bar" aria-hidden="true">
-  <div class="t"><b id="barName"></b><span id="barPrice"></span></div>
-  <a class="cta" id="barCta" data-cta rel="nofollow sponsored noopener" tabindex="-1">Cek promo di Shopee</a>
+body{font:15px system-ui,sans-serif;margin:0;background:#eef4f7;color:#13232c}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:20px}h2{font-size:16px;margin:22px 0 8px}
+.box{background:#fff;border:1px solid #d8e3e9;border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:#566b77;margin:8px 0 3px}
+input,textarea,select{width:100%;padding:9px;border:1px solid #c5d3db;border-radius:8px;font:inherit;box-sizing:border-box}
+textarea{min-height:60px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+button{padding:10px 16px;border:0;border-radius:8px;background:#0d2b3a;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020;border:1px solid #e3b5bd}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.th{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#dbe9f0}
+.tag{font-weight:700;color:#17435a}
+#msg{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#0d2b3a;color:#fff;padding:10px 16px;border-radius:10px;display:none}
+</style></head><body><main>
+<h1>Admin halaman Shopee</h1>
+<div class="box row">
+  <select id="pages" style="flex:1"></select>
+  <button onclick="load(pages.value)">Buka</button>
+  <input id="newslug" placeholder="slug baru, mis. hujan" style="flex:1">
+  <button class="y" onclick="newPage()">Buat baru</button>
 </div>
-
+<details class="box"><summary><b>Pengaturan beranda ( / )</b></summary>
+<div class="g"><div><label>Nama etalase</label><input id="s_brand"></div><div><label>Meta Pixel ID (kosong = ikut halaman pertama)</label><input id="s_pixel"></div><div><label>Prefix Sub_ID beranda</label><input id="s_prefix" value="home"></div><div><label>Teks banner (hanya isi yang benar-benar berlaku)</label><input id="s_banner"></div></div>
+<label>Disclosure afiliasi</label><textarea id="s_disc"></textarea><br><button class="y" onclick="saveSite()">Simpan beranda</button></details>
+<div id="ed" hidden>
+ <h2>Halaman: <span id="cur" class="tag"></span> <a id="open" target="_blank" href="#">lihat</a></h2>
+ <div class="box"><div class="g">
+  <div><label>Meta Pixel ID</label><input id="pixelId"></div>
+  <div><label>Prefix Sub_ID (mis. meta_hujan_vid1)</label><input id="subIdPrefix"></div>
+  <div><label>Nama parameter Sub_ID</label><input id="subIdParam" value="site_id"></div>
+  <div><label>Nama brand (atas halaman)</label><input id="brand"></div></div>
+  <label>Headline (samakan dengan hook video)</label><input id="headline">
+  <label>Sub-headline</label><input id="sub">
+  <label>Keunggulan (1 baris = 1 poin, maks 3)</label><textarea id="benefits"></textarea>
+  <label>Teks tombol produk utama</label><input id="cta" value="Beli produk ini di Shopee">
+  <label>Judul bagian produk lain</label><input id="moreTitle" value="Pilihan lain yang cocok">
+  <label>Disclosure afiliasi</label><textarea id="disclosure">Halaman ini berisi tautan afiliasi Shopee. Jika kamu membeli lewat tautan ini, kami bisa menerima komisi tanpa biaya tambahan untukmu.</textarea>
+  <label><input type="checkbox" id="showHome" checked style="width:auto"> Tampilkan produk halaman ini di beranda</label>
+  <label>Ulasan asli (1 baris: Nama | isi ulasan). Kosongkan jika belum ada.</label><textarea id="reviews"></textarea>
+ </div>
+ <h2>Produk (yang pertama = produk utama / hero)</h2>
+ <div id="prods"></div>
+ <div class="row"><button onclick="addProd()">+ Tambah produk</button><button class="y" onclick="save()">Simpan</button><button class="x" onclick="del()">Hapus halaman</button></div>
+</div>
+<div id="msg"></div>
 <script>
-/* ============================================================
-   CONFIG: satu-satunya bagian yang perlu diedit per niche/halaman
-   ============================================================ */
-const DEFAULT_CONFIG = {
-  pixelId: "ISI_PIXEL_ID",          // contoh: "1234567890123456"
-  subIdParam: "site_id",            // nama parameter Sub_ID (sesuai brief)
-  subIdPrefix: "meta_hujan_vid1",   // identitas materi iklan; ditambah _utama / _alt1 / _alt2 ...
-  brand: "Pilihan Perlengkapan Hujan",
-  pageTitle: "Perlengkapan Hujan Pilihan | Toko Resmi Shopee",
-  disclosure: "Halaman ini berisi tautan afiliasi Shopee. Jika kamu membeli lewat tautan ini, kami bisa menerima komisi tanpa biaya tambahan untukmu.",
-
-  hero: {
-    // headline HARUS sama dengan hook video iklan
-    headline: "Hujan deras, tetap kering sampai tujuan",
-    sub: "Satu pilihan yang paling sering dibeli, langsung dari toko resmi Shopee.",
-    benefits: ["Bahan anti bocor, tidak tembus air", "Ringan, muat di jok motor", "Pengiriman cepat dari toko terpercaya"],
-    id: "hero1",
-    name: "GANTI: Nama Produk Utama",
-    price: 99000,
-    oldPrice: 149000,              // isi null jika tidak ada
-    rating: 4.9,                   // GANTI dengan data asli
-    sold: "10rb+ terjual",         // GANTI dengan data asli
-    store: "Shopee Mall",          // atau "Star+"
-    img: "img/hero.jpg",           // taruh foto sendiri di public/img/ (kompres, < 80 KB)
-    link: "#",                     // GANTI: link affiliate lengkap produk utama
-    cta: "Beli produk ini di Shopee"
-  },
-
-  products: [
-    { id:"p1", cat:"Jas hujan",  name:"GANTI: Produk pendukung 1", price:85000,  rating:4.8, sold:"5rb+ terjual", img:"img/p1.jpg", link:"#", desc:"GANTI: 1-2 kalimat keunggulan produk." },
-    { id:"p2", cat:"Jas hujan",  name:"GANTI: Produk pendukung 2", price:120000, rating:4.9, sold:"3rb+ terjual", img:"img/p2.jpg", link:"#", desc:"GANTI: 1-2 kalimat keunggulan produk." },
-    { id:"p3", cat:"Aksesori",   name:"GANTI: Produk pendukung 3", price:65000,  rating:4.8, sold:"8rb+ terjual", img:"img/p3.jpg", link:"#", desc:"GANTI: 1-2 kalimat keunggulan produk." },
-    { id:"p4", cat:"Aksesori",   name:"GANTI: Produk pendukung 4", price:75000,  rating:4.9, sold:"2rb+ terjual", img:"img/p4.jpg", link:"#", desc:"GANTI: 1-2 kalimat keunggulan produk." }
-  ],
-
-  moreTitle: "Pilihan lain yang cocok",
-  moreLead: "Kalau yang di atas belum pas, ini produk lain dari toko yang sama-sama terpercaya.",
-
-  // Isi HANYA dengan ulasan asli dari halaman produk Shopee. Kosongkan array = bagian ini disembunyikan.
-  reviews: [
-    // { name:"Budi", text:"Isi ulasan asli...", source:"Ulasan pembeli di Shopee" }
-  ]
-};
-/* ============================ END CONFIG ============================ */
-
-function boot(C){
-  var H = C.hero;
-  var $ = function(s){return document.querySelector(s)};
-  var esc = function(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
-  var rp = function(n){return "Rp\u00a0"+Number(n).toLocaleString("id-ID")};
-  var pixelOn = /^\d{10,20}$/.test(C.pixelId);
-
-  /* ---- placeholder gambar bila file belum ada ---- */
-  function ph(name){
-    var t = esc((name||"?").replace(/^GANTI:\s*/,"").trim().charAt(0).toUpperCase()||"?");
-    var svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' fill='%23dbe9f0'/><text x='100' y='122' font-size='84' text-anchor='middle' fill='%2317435a' font-family='sans-serif' font-weight='700'>"+t+"</text></svg>";
-    return "data:image/svg+xml;utf8,"+svg.replace(/#/g,"%23");
-  }
-  function imgTag(src,name,hero){
-    return '<img src="'+esc(src)+'" alt="'+esc(name)+'" '+(hero?'fetchpriority="high" width="600" height="600"':'loading="lazy" width="300" height="300"')+' decoding="async" onerror="this.onerror=null;this.src=\''+ph(name).replace(/'/g,"%27")+'\'">';
-  }
-
-  /* ---- link + Sub_ID ---- */
-  function build(link,suffix){
-    if(!link || link==="#") return "#";
-    try{
-      var u = new URL(link);
-      u.searchParams.set(C.subIdParam, C.subIdPrefix+"_"+suffix);
-      return u.toString();
-    }catch(e){ return link; }
-  }
-
-  /* ---- Meta Pixel (hanya jika ID valid) ---- */
-  if(pixelOn){
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq("init",C.pixelId);
-    fbq("track","PageView");
-  }
-
-  /* ---- render ---- */
-  document.title = C.pageTitle;
-  $("#brand").textContent = C.brand;
-  $("#h1").textContent = H.headline;
-  $("#sub").textContent = H.sub;
-  $("#benefits").innerHTML = H.benefits.map(function(b){return "<li>"+esc(b)+"</li>"}).join("");
-  $("#disclosure").textContent = C.disclosure;
-  $("#moreTitle").textContent = C.moreTitle;
-  $("#moreLead").textContent = C.moreLead;
-
-  var heroUrl = build(H.link,"utama");
-  var chips = ['<span class="chip">\u2605 '+esc(H.rating)+'</span>','<span class="chip">'+esc(H.sold)+'</span>','<span class="chip">'+esc(H.store)+'</span>'].join("");
-  $("#heroCard").innerHTML =
-    '<div class="pic">'+imgTag(H.img,H.name,true)+'</div>'+
-    (H.imgs&&H.imgs.length>1?'<div class="thumbs">'+H.imgs.map(function(s,n){return '<button type="button" data-s="'+esc(s)+'" aria-label="Foto '+(n+1)+'"><img src="'+esc(s)+'" alt="" loading="lazy" width="56" height="56"></button>'}).join('')+'</div>':'')+
-    '<h2>'+esc(H.name)+'</h2>'+
-    '<div class="price-row"><span class="price">'+rp(H.price)+'</span>'+(H.oldPrice?'<span class="was">'+rp(H.oldPrice)+'</span>':'')+'</div>'+
-    '<div class="chips">'+chips+'</div>'+
-    '<a class="cta" id="heroCta" href="'+esc(heroUrl)+'" data-cta data-id="'+esc(H.id)+'" data-name="'+esc(H.name)+'" rel="nofollow sponsored noopener">'+esc(H.cta)+'</a>'+
-    '<p class="note">Kamu akan diarahkan ke aplikasi Shopee</p>';
-
-  var cats = [];
-  C.products.forEach(function(p){ if(cats.indexOf(p.cat)<0) cats.push(p.cat); });
-  $("#filters").innerHTML = ['Semua'].concat(cats).map(function(c,i){
-    return '<button type="button" data-cat="'+esc(i?c:"")+'" aria-pressed="'+(i===0)+'">'+esc(c)+'</button>';
-  }).join("");
-  if(cats.length<2) $("#filters").hidden = true;
-
-  $("#grid").innerHTML = C.products.map(function(p,i){
-    var url = build(p.link,"alt"+(i+1));
-    return '<article class="card" data-cat="'+esc(p.cat)+'">'+
-      '<div class="pic">'+imgTag(p.img,p.name,false)+'</div>'+
-      '<h4>'+esc(p.name)+'</h4>'+
-      '<div class="p">'+rp(p.price)+'</div>'+
-      '<div class="m">\u2605 '+esc(p.rating)+' \u00b7 '+esc(p.sold)+'</div>'+
-      '<div class="detail" id="d-'+esc(p.id)+'" hidden>'+esc(p.desc)+'</div>'+
-      '<div class="acts">'+
-        '<button type="button" class="ghost" data-detail="d-'+esc(p.id)+'" aria-expanded="false">Lihat detail</button>'+
-        '<a class="cta sm" href="'+esc(url)+'" data-cta data-id="'+esc(p.id)+'" data-name="'+esc(p.name)+'" rel="nofollow sponsored noopener">Beli di Shopee</a>'+
-      '</div></article>';
-  }).join("");
-
-  if(C.reviews && C.reviews.length){
-    $("#revSec").hidden = false;
-    $("#reviews").innerHTML = C.reviews.map(function(r){
-      return '<blockquote class="rev"><p>'+esc(r.text)+'</p><small>'+esc(r.name)+' \u00b7 '+esc(r.source||"Ulasan di Shopee")+'</small></blockquote>';
-    }).join("");
-  }
-
-  /* sticky bar */
-  $("#barName").textContent = H.name;
-  $("#barPrice").textContent = rp(H.price);
-  var barCta = $("#barCta");
-  barCta.href = heroUrl; barCta.dataset.id = H.id; barCta.dataset.name = H.name;
-  var bar = $("#bar");
-  if("IntersectionObserver" in window){
-    new IntersectionObserver(function(en){
-      var on = !en[0].isIntersecting && en[0].boundingClientRect.top < 0;
-      bar.classList.toggle("on",on);
-      bar.setAttribute("aria-hidden",String(!on));
-      barCta.tabIndex = on?0:-1;
-    },{threshold:0}).observe($("#heroCta"));
-  }
-
-  $("#heroCard").addEventListener("click",function(e){var b=e.target.closest(".thumbs button");if(b)document.querySelector("#heroCard .pic img").src=b.dataset.s;});
-  /* draft banner */
-  var isDraft = !pixelOn || heroUrl==="#" || /GANTI/.test(H.name);
-  $("#draft").hidden = !isDraft;
-
-  /* ---- interaksi: filter & detail ---- */
-  $("#filters").addEventListener("click",function(e){
-    var b = e.target.closest("button"); if(!b) return;
-    var c = b.dataset.cat;
-    document.querySelectorAll("#filters button").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});
-    document.querySelectorAll("#grid .card").forEach(function(card){card.hidden = !!c && card.dataset.cat!==c});
-  });
-  $("#grid").addEventListener("click",function(e){
-    var b = e.target.closest("[data-detail]"); if(!b) return;
-    var d = document.getElementById(b.dataset.detail);
-    var open = d.hidden;
-    d.hidden = !open;
-    b.setAttribute("aria-expanded",String(open));
-    b.textContent = open ? "Tutup detail" : "Lihat detail";
-  });
-
-  /* ---- CTA: Pixel -> jeda 250ms -> redirect, dengan anti double-fire ---- */
-  var locked = false;
-  window.addEventListener("pageshow",function(){ locked = false; }); // reset saat user kembali dari Shopee
-  document.addEventListener("click",function(e){
-    var a = e.target.closest("a[data-cta]"); if(!a) return;
-    e.preventDefault();
-    var url = a.href;
-    if(a.getAttribute("href")==="#" || url.slice(-1)==="#") return; // draft: tidak ada tujuan
-    if(locked) return;
-    locked = true;
-    var delay = 0;
-    try{
-      if(pixelOn && typeof fbq==="function"){
-        fbq("track","InitiateCheckout",{
-          content_name:a.dataset.name, content_ids:[a.dataset.id], content_type:"product", currency:"IDR"
-        },{eventID:"ic_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)});
-        delay = 250;
-      }
-    }catch(err){}
-    setTimeout(function(){ window.location.href = url; }, delay);
-    setTimeout(function(){ locked = false; }, 3000); // pengaman jika redirect gagal
-  });
+const $=id=>document.getElementById(id);
+const F=[['link','Link afiliasi lengkap'],['name','Nama produk'],['price','Harga (angka)','number'],['oldPrice','Harga coret (opsional)','number'],['rating','Rating (mis. 4.9)'],['sold','Terjual (mis. 10rb+ terjual)'],['store','Toko (Shopee Mall / Star+)'],['cat','Kategori (untuk beranda & filter)'],['desc','Deskripsi singkat']];
+let slug='';
+function toast(t){const m=$('msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',2500)}
+async function api(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(r.status);return r.json()}
+async function refresh(){const l=await api('/api/admin/pages');$('pages').innerHTML=l.map(s=>`<option>${s}</option>`).join('')}
+function newPage(){const s=$('newslug').value.trim().toLowerCase().replace(/[^\w-]/g,'');if(!s)return;slug=s;fill({});}
+async function load(s){if(!s)return;slug=s;fill(await api('/api/admin/page/'+s))}
+function fill(c){
+  $('ed').hidden=false;$('cur').textContent=slug;$('open').href='/'+slug;
+  const h=c.hero||{};
+  ['pixelId','subIdPrefix','subIdParam','brand','moreTitle','disclosure'].forEach(k=>{if(c[k]!=null)$(k).value=c[k]});
+  $('headline').value=h.headline||'';$('sub').value=h.sub||'';$('cta').value=h.cta||$('cta').value;
+  $('showHome').checked=c.showHome!==false;
+  $('benefits').value=(h.benefits||[]).join('\n');
+  $('reviews').value=(c.reviews||[]).map(r=>r.name+' | '+r.text).join('\n');
+  $('prods').innerHTML='';
+  const all=c.hero?[h].concat(c.products||[]):[];
+  all.forEach(addProd);if(!all.length)addProd();
 }
-var INJECTED = /*__DATA__*/null;
-boot(INJECTED || DEFAULT_CONFIG);
-</script>
-</body>
-</html>
+async function conv(blob){
+  const bm=await createImageBitmap(blob),s=Math.min(1,800/Math.max(bm.width,bm.height));
+  const c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);
+  c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  const b=await new Promise(r=>c.toBlob(r,'image/webp',.8));
+  return (await api('/api/admin/img',{method:'POST',headers:{'content-type':b.type},body:b})).url;
+}
+function addProd(p){
+  p=p&&p.name!==undefined?p:{};
+  const d=document.createElement('div');d.className='box';
+  d._imgs=(p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[])).slice();
+  const first=!$('prods').children.length;
+  d.innerHTML=`<div class="row"><span class="tag">${first?'Produk utama':'Produk pendukung'}</span><button class="x" style="margin-left:auto" onclick="this.closest('.box').remove()">Hapus</button></div>
+  <label>URL gambar dari Shopee (tempel banyak, 1 per baris; gambar pertama = gambar utama)</label>
+  <textarea class="urls" placeholder="https://down-id.img.susercontent.com/file/..."></textarea>
+  <div class="row"><button class="go">Ambil &amp; ubah ke WebP</button><span>atau upload file:</span><input type="file" accept="image/*" multiple style="width:auto"></div>
+  <div class="row thumbs"></div><div class="g">`+
+  F.map(([k,l,t])=>`<div><label>${l}</label><input data-k="${k}" type="${t||'text'}" value="${(p[k]??'').toString().replace(/"/g,'&quot;')}"></div>`).join('')+'</div>';
+  const th=d.querySelector('.thumbs');
+  const draw=()=>{th.innerHTML=d._imgs.map((u,i)=>`<span><img class="th" src="${u}"><br><a href="#" data-i="${i}">hapus</a></span>`).join('')};
+  th.onclick=e=>{const a=e.target.closest('a[data-i]');if(!a)return;e.preventDefault();d._imgs.splice(+a.dataset.i,1);draw()};
+  draw();
+  d.querySelector('.go').onclick=async()=>{
+    const ta=d.querySelector('.urls'),urls=ta.value.split(/\s+/).filter(u=>/^https?:\/\//.test(u));
+    let ok=0,bad=0;
+    for(const u of urls){toast(`Memproses ${ok+bad+1}/${urls.length}...`);
+      try{const r=await fetch('/api/admin/fetch-img?url='+encodeURIComponent(u));if(!r.ok)throw 0;d._imgs.push(await conv(await r.blob()));ok++;draw()}catch(e){bad++}}
+    ta.value='';toast(`${ok} gambar berhasil`+(bad?`, ${bad} gagal (coba upload file)`:''));
+  };
+  d.querySelector('input[type=file]').onchange=async e=>{
+    let n=0;for(const f of e.target.files){try{d._imgs.push(await conv(f));n++;draw()}catch(x){}}
+    toast(n+' gambar terunggah');
+  };
+  $('prods').appendChild(d);
+}
+async function loadSite(){try{const s=await api('/api/admin/site');$('s_brand').value=s.brand||'';$('s_pixel').value=s.pixelId||'';$('s_prefix').value=s.subIdPrefix||'home';$('s_banner').value=s.banner||'';$('s_disc').value=s.disclosure||''}catch(e){}}
+async function saveSite(){try{await api('/api/admin/site',{method:'PUT',body:JSON.stringify({brand:$('s_brand').value,pixelId:$('s_pixel').value.trim(),subIdPrefix:$('s_prefix').value.trim()||'home',banner:$('s_banner').value,disclosure:$('s_disc').value})});toast('Beranda tersimpan')}catch(e){toast('Gagal simpan')}}
+function collect(){
+  const rows=[...$('prods').children].map((d,i)=>{const o={};d.querySelectorAll('[data-k]').forEach(el=>{let v=el.value.trim();if(el.type==='number')v=v?Number(v):null;o[el.dataset.k]=v});o.id=i?'p'+i:'hero1';o.imgs=d._imgs||[];o.img=o.imgs[0]||'';return o});
+  const hero=rows[0]||{};
+  Object.assign(hero,{headline:$('headline').value,sub:$('sub').value,cta:$('cta').value,benefits:$('benefits').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,3)});
+  return{pixelId:$('pixelId').value.trim(),subIdParam:$('subIdParam').value.trim()||'site_id',subIdPrefix:$('subIdPrefix').value.trim(),brand:$('brand').value,pageTitle:$('brand').value,
+    disclosure:$('disclosure').value,moreTitle:$('moreTitle').value,moreLead:'',showHome:$('showHome').checked,hero,products:rows.slice(1),
+    reviews:$('reviews').value.split('\n').filter(l=>l.includes('|')).map(l=>{const[n,...t]=l.split('|');return{name:n.trim(),text:t.join('|').trim(),source:'Ulasan pembeli di Shopee'}})};
+}
+async function save(){try{await api('/api/admin/page/'+slug,{method:'PUT',body:JSON.stringify(collect())});toast('Tersimpan');refresh()}catch(e){toast('Gagal simpan')}}
+async function del(){if(!confirm('Hapus halaman '+slug+'?'))return;await api('/api/admin/page/'+slug,{method:'DELETE'});$('ed').hidden=true;refresh()}
+loadSite();refresh().then(()=>load($('pages').value));
+</script></main></body></html>
