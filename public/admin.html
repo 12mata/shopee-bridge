@@ -84,6 +84,7 @@ function addProd(p){
   d._imgs=(p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[])).slice();
   const first=!$('prods').children.length;
   d.innerHTML=`<div class="row"><span class="tag">${first?'Produk utama':'Produk pendukung'}</span><button class="x" style="margin-left:auto" onclick="this.closest('.box').remove()">Hapus</button></div>
+  ${p.sourceUrl?`<div style="font-size:13px;margin-top:6px">Link produk asli: <a href="${p.sourceUrl}" target="_blank" rel="noopener">buka di Shopee</a> (buat link afiliasinya dari sini, lalu tempel di kolom "Link afiliasi" di bawah)</div><input type="hidden" data-k="sourceUrl" value="${p.sourceUrl}">`:''}
   <label>URL gambar dari Shopee (tempel banyak, 1 per baris; gambar pertama = gambar utama)</label>
   <textarea class="urls" placeholder="https://down-id.img.susercontent.com/file/..."></textarea>
   <div class="row"><button class="go">Ambil &amp; ubah ke WebP</button><span>atau upload file:</span><input type="file" accept="image/*" multiple style="width:auto"></div>
@@ -124,7 +125,7 @@ $('imp').onchange=async e=>{
     const arr=JSON.parse(await f.text());
     [...$('prods').children].forEach(d=>{const v=k=>d.querySelector('[data-k='+k+']').value;if(!v('name')&&!v('link')&&!(d._imgs||[]).length)d.remove()});
     arr.forEach(it=>{
-      addProd({name:it.name,price:it.price,oldPrice:it.oldPrice,rating:it.rating,sold:it.sold,store:it.store,cat:it.cat,desc:it.desc});
+      addProd({name:it.name,price:it.price,oldPrice:it.oldPrice,rating:it.rating,sold:it.sold,store:it.store,cat:it.cat,desc:it.desc,sourceUrl:it.sourceUrl});
       $('prods').lastChild.querySelector('.urls').value=(it.images||[]).join('\n');
     });
     toast(arr.length+' produk diimpor. Isi link afiliasi tiap produk.');
