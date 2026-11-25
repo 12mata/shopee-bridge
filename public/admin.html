@@ -15,7 +15,7 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
 .th{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#dbe9f0}
 .tag{font-weight:700;color:#17435a}
 #msg{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#0d2b3a;color:#fff;padding:10px 16px;border-radius:10px;display:none}
-</style></head><body><main>
+#qm{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:40px 12px}#qm[hidden]{display:none}.res{cursor:pointer;margin:6px 0;padding:8px}.res:hover{border-color:#ffc21a}small{color:#566b77}</style></head><body><main>
 <h1>Admin halaman Shopee</h1>
 <div class="box row">
   <select id="pages" style="flex:1"></select>
@@ -24,13 +24,13 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
   <button class="y" onclick="newPage()">Buat baru</button>
 </div>
 <details class="box"><summary><b>Pengaturan beranda ( / )</b></summary>
-<div class="g"><div><label>Nama etalase</label><input id="s_brand"></div><div><label>Meta Pixel ID (kosong = ikut halaman pertama)</label><input id="s_pixel"></div><div><label>Prefix Sub_ID beranda</label><input id="s_prefix" value="home"></div><div><label>Teks banner (hanya isi yang benar-benar berlaku)</label><input id="s_banner"></div></div>
+<div class="g"><div><label>Nama etalase</label><input id="s_brand"></div><div><label>Meta Pixel ID (kosong = ikut halaman pertama)</label><input id="s_pixel"></div><div><label>Prefix Sub_ID beranda</label><input id="s_prefix" placeholder="kosongkan jika Sub_ID dibuat di Shopee"></div><div><label>Teks banner (hanya isi yang benar-benar berlaku)</label><input id="s_banner"></div></div>
 <label>Judul SEO beranda</label><input id="s_seotitle" maxlength="90"><label>Meta description beranda</label><textarea id="s_seodesc" maxlength="200"></textarea><br><button class="y" onclick="saveSite()">Simpan beranda</button></details>
 <div id="ed" hidden>
  <h2>Halaman: <span id="cur" class="tag"></span> <a id="open" target="_blank" href="#">lihat</a></h2>
  <div class="box"><div class="g">
   <div><label>Meta Pixel ID</label><input id="pixelId"></div>
-  <div><label>Prefix Sub_ID (mis. meta_hujan_vid1)</label><input id="subIdPrefix"></div>
+  <div><label>Prefix Sub_ID (kosongkan jika Sub_ID sudah dibuat di Shopee)</label><input id="subIdPrefix"></div>
   <div><label>Nama parameter Sub_ID</label><input id="subIdParam" value="site_id"></div>
   <div><label>Nama brand (atas halaman)</label><input id="brand"></div>
   <div><label>Nama di menu navigasi</label><input id="navLabel" placeholder="mis. Jas Hujan"></div></div>
@@ -46,9 +46,30 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
  </div>
  <h2>Produk (yang pertama = produk utama / hero)</h2>
  <div class="row" style="margin-bottom:10px"><label style="margin:0">Impor hasil ekstensi (.json): <input type="file" id="imp" accept=".json" style="width:auto"></label></div>
+ <div class="box"><div class="row">
+  <button class="y" id="bulk">Ambil &amp; ubah SEMUA gambar ke WebP</button>
+  <label style="margin:0">Maks. gambar/produk <input id="maxImg" type="number" value="4" min="1" max="8" style="width:70px"></label>
+  <label style="margin:0"><input type="checkbox" id="autoImg" checked style="width:auto"> otomatis setelah impor</label></div>
+  <div id="bulkst" style="font-size:13px;color:#566b77;margin-top:6px"></div></div>
+ <div class="box row" style="position:sticky;top:0;z-index:5">
+  <label style="margin:0"><input type="checkbox" id="selAll" style="width:auto"> Pilih semua</label>
+  <button type="button" id="selNoLink" style="background:#fff;color:#0d2b3a;border:1px solid #c5d3db">Pilih yang belum ada link</button>
+  <button type="button" class="x" id="delSel">Hapus terpilih (0)</button>
+  <button type="button" class="y" id="quick" style="margin-left:auto">Isi cepat (Ctrl/Cmd+K)</button>
+ </div>
  <div id="prods"></div>
  <div class="row"><button onclick="addProd()">+ Tambah produk</button><button class="y" onclick="save()">Simpan</button><button class="x" onclick="del()">Hapus halaman</button></div>
 </div>
+<div id="qm" hidden><div class="box" style="width:100%;max-width:520px;margin:0">
+ <div class="row"><b style="font-size:16px">Isi cepat produk</b><button type="button" class="x" style="margin-left:auto" onclick="qClose()">Tutup (Esc)</button></div>
+ <label>Ketik beberapa kata dari judul produk (mis. 3 kata)</label><input id="qq" autocomplete="off" placeholder="mis. kacamata anak bayi">
+ <div id="qres"></div>
+ <div id="qf" hidden><div style="margin:10px 0 0">Produk: <b id="qn"></b></div>
+  <label>Link afiliasi</label><input id="ql" autocomplete="off">
+  <div class="g"><div><label>Bintang (mis. 4.8)</label><input id="qr" autocomplete="off"></div>
+  <div><label>Toko</label><select id="qs"><option value="">(tidak diubah)</option><option>Shopee Mall</option><option>Star+</option></select></div></div>
+  <button type="button" class="y" id="qgo" style="margin-top:10px">Isi &amp; lanjut (Enter)</button></div>
+</div></div>
 <div id="msg"></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -83,7 +104,7 @@ function addProd(p){
   const d=document.createElement('div');d.className='box';
   d._imgs=(p.imgs&&p.imgs.length?p.imgs:(p.img?[p.img]:[])).slice();
   const first=!$('prods').children.length;
-  d.innerHTML=`<div class="row"><span class="tag">${first?'Produk utama':'Produk pendukung'}</span><button class="x" style="margin-left:auto" onclick="this.closest('.box').remove()">Hapus</button></div>
+  d.innerHTML=`<div class="row"><input type="checkbox" class="sel" style="width:auto"><span class="tag">${first?'Produk utama':'Produk pendukung'}</span><button class="x" style="margin-left:auto" onclick="delBox(this)">Hapus</button></div>
   ${p.sourceUrl?`<div style="font-size:13px;margin-top:6px">Link produk asli: <a href="${p.sourceUrl}" target="_blank" rel="noopener">buka di Shopee</a> (buat link afiliasinya dari sini, lalu tempel di kolom "Link afiliasi" di bawah)</div><input type="hidden" data-k="sourceUrl" value="${p.sourceUrl}">`:''}
   <label>URL gambar dari Shopee (tempel banyak, 1 per baris; gambar pertama = gambar utama)</label>
   <textarea class="urls" placeholder="https://down-id.img.susercontent.com/file/..."></textarea>
@@ -94,21 +115,25 @@ function addProd(p){
   const draw=()=>{th.innerHTML=d._imgs.map((u,i)=>`<span><img class="th" src="${u}"><br><a href="#" data-i="${i}">hapus</a></span>`).join('')};
   th.onclick=e=>{const a=e.target.closest('a[data-i]');if(!a)return;e.preventDefault();d._imgs.splice(+a.dataset.i,1);draw()};
   draw();
-  d.querySelector('.go').onclick=async()=>{
-    const ta=d.querySelector('.urls'),urls=ta.value.split(/\s+/).filter(u=>/^https?:\/\//.test(u));
-    let ok=0,bad=0;
-    for(const u of urls){toast(`Memproses ${ok+bad+1}/${urls.length}...`);
-      try{const r=await fetch('/api/admin/fetch-img?url='+encodeURIComponent(u));if(!r.ok)throw 0;d._imgs.push(await conv(await r.blob()));ok++;draw()}catch(e){bad++}}
-    ta.value='';toast(`${ok} gambar berhasil`+(bad?`, ${bad} gagal (coba upload file)`:''));
+  d._go=async max=>{
+    const ta=d.querySelector('.urls');let urls=ta.value.split(/\s+/).filter(u=>/^https?:\/\//.test(u));
+    if(max)urls=urls.slice(0,max);
+    let ok=0;const bad=[];
+    for(const u of urls){
+      try{const r=await fetch('/api/admin/fetch-img?url='+encodeURIComponent(u));if(!r.ok)throw 0;d._imgs.push(await conv(await r.blob()));ok++;draw()}catch(e){bad.push(u)}
+    }
+    ta.value=bad.join('\n');
+    return{ok,bad:bad.length};
   };
+  d.querySelector('.go').onclick=async()=>{toast('Memproses...');const r=await d._go(+$('maxImg').value||0);toast(r.ok+' gambar berhasil'+(r.bad?', '+r.bad+' gagal':''))};
   d.querySelector('input[type=file]').onchange=async e=>{
     let n=0;for(const f of e.target.files){try{d._imgs.push(await conv(f));n++;draw()}catch(x){}}
     toast(n+' gambar terunggah');
   };
-  $('prods').appendChild(d);
+  $('prods').appendChild(d);updSel();
 }
-async function loadSite(){try{const s=await api('/api/admin/site');$('s_brand').value=s.brand||'';$('s_seotitle').value=s.seoTitle||'';$('s_seodesc').value=s.seoDesc||'';$('s_pixel').value=s.pixelId||'';$('s_prefix').value=s.subIdPrefix||'home';$('s_banner').value=s.banner||''}catch(e){}}
-async function saveSite(){try{await api('/api/admin/site',{method:'PUT',body:JSON.stringify({brand:$('s_brand').value,seoTitle:$('s_seotitle').value.trim(),seoDesc:$('s_seodesc').value.trim(),pixelId:$('s_pixel').value.trim(),subIdPrefix:$('s_prefix').value.trim()||'home',banner:$('s_banner').value})});toast('Beranda tersimpan')}catch(e){toast('Gagal simpan')}}
+async function loadSite(){try{const s=await api('/api/admin/site');$('s_brand').value=s.brand||'';$('s_seotitle').value=s.seoTitle||'';$('s_seodesc').value=s.seoDesc||'';$('s_pixel').value=s.pixelId||'';$('s_prefix').value=s.subIdPrefix==null?'':s.subIdPrefix;$('s_banner').value=s.banner||''}catch(e){}}
+async function saveSite(){try{await api('/api/admin/site',{method:'PUT',body:JSON.stringify({brand:$('s_brand').value,seoTitle:$('s_seotitle').value.trim(),seoDesc:$('s_seodesc').value.trim(),pixelId:$('s_pixel').value.trim(),subIdPrefix:$('s_prefix').value.trim(),banner:$('s_banner').value})});toast('Beranda tersimpan')}catch(e){toast('Gagal simpan')}}
 function collect(){
   const rows=[...$('prods').children].map((d,i)=>{const o={};d.querySelectorAll('[data-k]').forEach(el=>{let v=el.value.trim();if(el.type==='number')v=v?Number(v):null;o[el.dataset.k]=v});o.id=i?'p'+i:'hero1';o.imgs=d._imgs||[];o.img=o.imgs[0]||'';return o});
   const hero=rows[0]||{};
@@ -119,6 +144,75 @@ function collect(){
 }
 async function save(){try{await api('/api/admin/page/'+slug,{method:'PUT',body:JSON.stringify(collect())});toast('Tersimpan');refresh()}catch(e){toast('Gagal simpan')}}
 async function del(){if(!confirm('Hapus halaman '+slug+'?'))return;await api('/api/admin/page/'+slug,{method:'DELETE'});$('ed').hidden=true;refresh()}
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const boxes=()=>[...$('prods').children];
+const val=(d,k)=>d.querySelector('[data-k='+k+']').value;
+function relabel(){boxes().forEach((d,i)=>{d.querySelector('.tag').textContent=i?'Produk pendukung':'Produk utama'})}
+function updSel(){
+  const all=boxes(),n=all.filter(d=>d.querySelector('.sel').checked).length;
+  $('delSel').textContent='Hapus terpilih ('+n+')';
+  $('selAll').checked=all.length>0&&n===all.length;$('selAll').indeterminate=n>0&&n<all.length;
+}
+function delBox(b){b.closest('.box').remove();relabel();updSel()}
+$('prods').addEventListener('change',e=>{if(e.target.classList.contains('sel'))updSel()});
+$('selAll').onchange=e=>{boxes().forEach(d=>d.querySelector('.sel').checked=e.target.checked);updSel()};
+$('selNoLink').onclick=()=>{let n=0;boxes().forEach(d=>{const x=!val(d,'link').trim();d.querySelector('.sel').checked=x;if(x)n++});updSel();toast(n+' produk belum ada link dipilih')};
+$('delSel').onclick=()=>{
+  const sel=boxes().filter(d=>d.querySelector('.sel').checked);
+  if(!sel.length)return toast('Belum ada produk yang dipilih');
+  if(!confirm('Hapus '+sel.length+' produk terpilih?'))return;
+  sel.forEach(d=>d.remove());relabel();updSel();toast(sel.length+' produk dihapus. Klik Simpan untuk menyimpan.');
+};
+
+/* ---- Isi cepat: cari produk dari beberapa kata judul, isi link/bintang/toko tanpa scroll ---- */
+let qSel=null,qRes=[];
+function qOpen(){if($('ed').hidden)return toast('Buka atau buat halaman dulu');$('qm').hidden=false;$('qq').value='';qPick(null);qSearch();$('qq').focus()}
+function qClose(){$('qm').hidden=true}
+function qStat(d){const f=(k,l)=>l+(val(d,k).trim()?' ✓':' ✗');return f('link','link')+' · '+f('rating','bintang')+' · '+f('store','toko')}
+function qSearch(){
+  const w=$('qq').value.toLowerCase().split(/\s+/).filter(Boolean);
+  let list=boxes().filter(d=>val(d,'name'));
+  list=w.length?list.filter(d=>w.every(t=>val(d,'name').toLowerCase().includes(t))):list.filter(d=>!val(d,'link').trim()||!val(d,'rating').trim()||!val(d,'store').trim());
+  qRes=list.slice(0,6);
+  $('qres').innerHTML=qRes.map((d,i)=>'<div class="box res" data-i="'+i+'">'+esc(val(d,'name').slice(0,80))+'<br><small>'+qStat(d)+'</small></div>').join('')||'<small>Tidak ada produk yang cocok.</small>';
+  if(w.length&&qRes.length===1)qPick(qRes[0]);else if(qSel&&!qRes.includes(qSel))qPick(null);
+}
+function qPick(d){
+  qSel=d;$('qf').hidden=!d;if(!d)return;
+  $('qn').textContent=val(d,'name').slice(0,80);
+  $('ql').value=val(d,'link');$('qr').value=val(d,'rating');$('qs').value=val(d,'store');
+  $('ql').focus();
+}
+function qGo(){
+  if(!qSel)return;
+  const set=(k,v)=>{qSel.querySelector('[data-k='+k+']').value=v};
+  if($('ql').value.trim())set('link',$('ql').value.trim());
+  if($('qr').value.trim())set('rating',$('qr').value.trim());
+  if($('qs').value)set('store',$('qs').value);
+  const d=qSel;d.style.outline='3px solid #ffc21a';setTimeout(()=>d.style.outline='',1500);
+  toast('Terisi: '+val(d,'name').slice(0,30));
+  qSel=null;$('qq').value='';qSearch();qPick(null);$('qq').focus();
+}
+$('quick').onclick=qOpen;$('qgo').onclick=qGo;$('qq').oninput=qSearch;
+$('qq').onkeydown=e=>{if(e.key==='Enter'&&!qSel&&qRes[0])qPick(qRes[0])};
+['ql','qr','qs'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter')qGo()});
+$('qres').onclick=e=>{const r=e.target.closest('[data-i]');if(r)qPick(qRes[+r.dataset.i])};
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();qOpen()}
+  if(e.key==='Escape')qClose();
+});
+async function bulkImages(){
+  const boxes=[...$('prods').children].filter(d=>(d.querySelector('.urls').value||'').trim());
+  if(!boxes.length){$('bulkst').textContent='Tidak ada URL gambar yang menunggu.';return}
+  const max=+$('maxImg').value||0,q=boxes.slice();let done=0,ok=0,bad=0;
+  $('bulk').disabled=true;
+  const run=async()=>{while(q.length){const d=q.shift(),r=await d._go(max);ok+=r.ok;bad+=r.bad;done++;
+    $('bulkst').textContent='Produk '+done+'/'+boxes.length+' selesai · '+ok+' gambar berhasil'+(bad?' · '+bad+' gagal':'')}};
+  await Promise.all([run(),run(),run()]);
+  $('bulk').disabled=false;
+  $('bulkst').textContent='Selesai: '+ok+' gambar berhasil'+(bad?', '+bad+' gagal (URL-nya tetap di kotak, coba lagi atau upload file)':'')+'. Jangan lupa klik Simpan.';
+}
+$('bulk').onclick=bulkImages;
 $('imp').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
   try{
@@ -129,6 +223,7 @@ $('imp').onchange=async e=>{
       $('prods').lastChild.querySelector('.urls').value=(it.images||[]).join('\n');
     });
     toast(arr.length+' produk diimpor. Isi link afiliasi tiap produk.');
+    if($('autoImg').checked)bulkImages();
   }catch(x){toast('File tidak valid')}
   e.target.value='';
 };
