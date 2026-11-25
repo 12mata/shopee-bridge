@@ -15,7 +15,15 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
 .th{width:64px;height:64px;object-fit:cover;border-radius:8px;background:#dbe9f0}
 .tag{font-weight:700;color:#17435a}
 #msg{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#0d2b3a;color:#fff;padding:10px 16px;border-radius:10px;display:none}
-#qm{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:40px 12px}#qm[hidden]{display:none}.res{cursor:pointer;margin:6px 0;padding:8px}.res:hover{border-color:#ffc21a}small{color:#566b77}</style></head><body><main>
+#qm{position:fixed;inset:0;z-index:50}#qm[hidden]{display:none}
+#qp{position:fixed;margin:0;overflow:auto;box-shadow:0 14px 40px rgba(0,0,0,.28);border-color:#c5d3db}
+#qres{max-height:210px;overflow:auto;margin-top:6px}
+.res{display:flex;gap:8px;align-items:center;cursor:pointer;margin:3px 0;padding:6px 9px;font-size:14px}
+.res span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res small{white-space:nowrap;font-size:12px}
+.res:hover{background:#f3f8fb}.res.on{border-color:#ee4d2d;background:#fff4f0}
+small{color:#566b77}
+</style></head><body><main>
 <h1>Admin halaman Shopee</h1>
 <div class="box row">
   <select id="pages" style="flex:1"></select>
@@ -60,15 +68,15 @@ button.y{background:#ffc21a;color:#0d2b3a}button.x{background:#fff;color:#b00020
  <div id="prods"></div>
  <div class="row"><button onclick="addProd()">+ Tambah produk</button><button class="y" onclick="save()">Simpan</button><button class="x" onclick="del()">Hapus halaman</button></div>
 </div>
-<div id="qm" hidden><div class="box" style="width:100%;max-width:520px;margin:0">
- <div class="row"><b style="font-size:16px">Isi cepat produk</b><button type="button" class="x" style="margin-left:auto" onclick="qClose()">Tutup (Esc)</button></div>
- <label>Ketik beberapa kata dari judul produk (mis. 3 kata)</label><input id="qq" autocomplete="off" placeholder="mis. kacamata anak bayi">
+<div id="qm" hidden><div id="qp" class="box">
+ <div class="row"><b>Isi cepat</b><small>&uarr;&darr; pilih &middot; Enter &middot; Esc tutup</small><button type="button" class="x" style="margin-left:auto;padding:5px 10px" onclick="qClose()">Tutup</button></div>
+ <input id="qq" autocomplete="off" placeholder="Ketik 3 kata judul, mis. kacamata anak bayi" style="margin-top:8px">
  <div id="qres"></div>
- <div id="qf" hidden><div style="margin:10px 0 0">Produk: <b id="qn"></b></div>
-  <label>Link afiliasi</label><input id="ql" autocomplete="off">
-  <div class="g"><div><label>Bintang (mis. 4.8)</label><input id="qr" autocomplete="off"></div>
-  <div><label>Toko</label><select id="qs"><option value="">(tidak diubah)</option><option>Shopee Mall</option><option>Star+</option></select></div></div>
-  <button type="button" class="y" id="qgo" style="margin-top:10px">Isi &amp; lanjut (Enter)</button></div>
+ <div id="qf" hidden><div style="margin:8px 0 0;font-size:13px">Produk: <b id="qn"></b></div>
+  <input id="ql" autocomplete="off" placeholder="Link afiliasi" style="margin-top:6px">
+  <div class="g" style="margin-top:6px"><input id="qr" autocomplete="off" placeholder="Bintang, mis. 4.8">
+  <select id="qs"><option value="">Toko (tidak diubah)</option><option>Shopee Mall</option><option>Star+</option></select></div>
+  <button type="button" class="y" id="qgo" style="margin-top:8px;padding:8px 14px">Isi &amp; lanjut (Enter)</button></div>
 </div></div>
 <div id="msg"></div>
 <script>
@@ -164,22 +172,29 @@ $('delSel').onclick=()=>{
   sel.forEach(d=>d.remove());relabel();updSel();toast(sel.length+' produk dihapus. Klik Simpan untuk menyimpan.');
 };
 
-/* ---- Isi cepat: cari produk dari beberapa kata judul, isi link/bintang/toko tanpa scroll ---- */
-let qSel=null,qRes=[];
-function qOpen(){if($('ed').hidden)return toast('Buka atau buat halaman dulu');$('qm').hidden=false;$('qq').value='';qPick(null);qSearch();$('qq').focus()}
+/* ---- Isi cepat: dropdown di bawah tombol, cari dari beberapa kata judul ---- */
+let qSel=null,qRes=[],qi=0;
+function qPlace(){
+  const r=$('quick').getBoundingClientRect(),p=$('qp'),w=Math.min(520,innerWidth-16);
+  let t=r.bottom+6;if(t<8||t>innerHeight-220)t=60;
+  p.style.width=w+'px';p.style.left=Math.max(8,Math.min(r.right-w,innerWidth-w-8))+'px';p.style.top=t+'px';p.style.maxHeight=(innerHeight-t-12)+'px';
+}
+function qOpen(){if($('ed').hidden)return toast('Buka atau buat halaman dulu');$('qm').hidden=false;qPlace();$('qq').value='';qPick(null);qSearch();$('qq').focus()}
 function qClose(){$('qm').hidden=true}
-function qStat(d){const f=(k,l)=>l+(val(d,k).trim()?' ✓':' ✗');return f('link','link')+' · '+f('rating','bintang')+' · '+f('store','toko')}
+function qStat(d){const f=(k,l)=>l+(val(d,k).trim()?'\u2713':'\u2717');return f('link','link')+' '+f('rating','bintang')+' '+f('store','toko')}
+function qHi(i){qi=i;[...$('qres').children].forEach((r,n)=>{r.classList.toggle('on',qRes[n]===qSel||(!qSel&&n===qi));if(n===qi&&!qSel)r.scrollIntoView({block:'nearest'})})}
 function qSearch(){
   const w=$('qq').value.toLowerCase().split(/\s+/).filter(Boolean);
   let list=boxes().filter(d=>val(d,'name'));
   list=w.length?list.filter(d=>w.every(t=>val(d,'name').toLowerCase().includes(t))):list.filter(d=>!val(d,'link').trim()||!val(d,'rating').trim()||!val(d,'store').trim());
-  qRes=list.slice(0,6);
-  $('qres').innerHTML=qRes.map((d,i)=>'<div class="box res" data-i="'+i+'">'+esc(val(d,'name').slice(0,80))+'<br><small>'+qStat(d)+'</small></div>').join('')||'<small>Tidak ada produk yang cocok.</small>';
-  if(w.length&&qRes.length===1)qPick(qRes[0]);else if(qSel&&!qRes.includes(qSel))qPick(null);
+  qRes=list.slice(0,30);
+  $('qres').innerHTML=qRes.map((d,i)=>'<div class="box res" data-i="'+i+'"><span>'+esc(val(d,'name'))+'</span><small>'+qStat(d)+'</small></div>').join('')||'<small>Tidak ada produk yang cocok.</small>';
+  if(w.length&&qRes.length===1)qPick(qRes[0]);else{if(qSel&&!qRes.includes(qSel))qPick(null);qHi(0)}
 }
 function qPick(d){
-  qSel=d;$('qf').hidden=!d;if(!d)return;
-  $('qn').textContent=val(d,'name').slice(0,80);
+  qSel=d;$('qf').hidden=!d;qHi(qi);
+  if(!d)return;
+  $('qn').textContent=val(d,'name').slice(0,70);
   $('ql').value=val(d,'link');$('qr').value=val(d,'rating');$('qs').value=val(d,'store');
   $('ql').focus();
 }
@@ -193,10 +208,16 @@ function qGo(){
   toast('Terisi: '+val(d,'name').slice(0,30));
   qSel=null;$('qq').value='';qSearch();qPick(null);$('qq').focus();
 }
-$('quick').onclick=qOpen;$('qgo').onclick=qGo;$('qq').oninput=qSearch;
-$('qq').onkeydown=e=>{if(e.key==='Enter'&&!qSel&&qRes[0])qPick(qRes[0])};
+$('quick').onclick=qOpen;$('qgo').onclick=qGo;$('qq').oninput=()=>{qSel=null;qSearch()};
+$('qm').onmousedown=e=>{if(e.target===$('qm'))qClose()};
+$('qq').onkeydown=e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();qHi(Math.min(qi+1,qRes.length-1))}
+  else if(e.key==='ArrowUp'){e.preventDefault();qHi(Math.max(qi-1,0))}
+  else if(e.key==='Enter'&&qRes[qi]){e.preventDefault();qPick(qRes[qi])}
+};
 ['ql','qr','qs'].forEach(id=>$(id).onkeydown=e=>{if(e.key==='Enter')qGo()});
 $('qres').onclick=e=>{const r=e.target.closest('[data-i]');if(r)qPick(qRes[+r.dataset.i])};
+addEventListener('resize',()=>{if(!$('qm').hidden)qPlace()});
 document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();qOpen()}
   if(e.key==='Escape')qClose();
